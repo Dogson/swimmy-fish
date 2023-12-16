@@ -1,0 +1,161 @@
+[gd_scene load_steps=15 format=3 uid="uid://icw65a4ovocb"]
+
+[ext_resource type="Script" path="res://Player.gd" id="1_hcno3"]
+[ext_resource type="Texture2D" uid="uid://b5vpasfv4xjmw" path="res://Fish.png" id="2_0r2qr"]
+[ext_resource type="Script" path="res://Jellyfish.gd" id="4_dxxcn"]
+[ext_resource type="Texture2D" uid="uid://n8o844awi1i4" path="res://Jellyfish.png" id="5_xxw5l"]
+[ext_resource type="Script" path="res://CheckpointArea2D.gd" id="6_d21hc"]
+[ext_resource type="PackedScene" uid="uid://dvqph8i87yii2" path="res://ui.tscn" id="7_1xu3i"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cwj3o"]
+radius = 5.0
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_82v1j"]
+radius = 6.0
+height = 22.0
+
+[sub_resource type="GDScript" id="GDScript_qqore"]
+script/source = "extends Node2D
+
+const INSTANTIATE_TICK = 70;
+const JELLYFISH: PackedScene = preload(\"res://jellyfish.tscn\");
+
+var instantiate_counter = 0;
+var score = 0;
+
+var ref_ui
+
+func increment_score():
+	score += 1;
+	ref_ui.changeScore(score)
+	
+
+func spawn_jellyfish():
+	var offset = randi() % 81 - 40
+	var instance = JELLYFISH.instantiate()
+	instance.position.y = offset;
+	
+	add_child(instance)
+	
+			
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	ref_ui = get_tree().current_scene.get_node('UI');
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta):
+	instantiate_counter += 1
+	if instantiate_counter == INSTANTIATE_TICK:
+		spawn_jellyfish()
+		instantiate_counter = 0
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b61ab"]
+size = Vector2(14, 159)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_1rvb5"]
+polygon = PackedVector2Array(-2.5, -189, -2.5, -29, 13.5, -29, 13.5, -189)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_kbjhb"]
+polygon = PackedVector2Array(-5.5, -189, 10.5, -189, 10.5, -29, -5.5, -29)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b5vfc"]
+size = Vector2(8, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cmteq"]
+size = Vector2(376, 208)
+
+[node name="World" type="Node2D"]
+position = Vector2(-16, 0)
+
+[node name="PlayerNode" type="Node2D" parent="."]
+
+[node name="Player" type="CharacterBody2D" parent="PlayerNode"]
+script = ExtResource("1_hcno3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerNode/Player"]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_cwj3o")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerNode/Player"]
+position = Vector2(1, 0)
+texture = ExtResource("2_0r2qr")
+
+[node name="Detect" type="Area2D" parent="PlayerNode/Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerNode/Player/Detect"]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_82v1j")
+
+[node name="JellyfishNode" type="Node2D" parent="."]
+position = Vector2(192, 0)
+script = SubResource("GDScript_qqore")
+
+[node name="Jellyfish" type="StaticBody2D" parent="JellyfishNode"]
+script = ExtResource("4_dxxcn")
+
+[node name="TopSprite" type="Sprite2D" parent="JellyfishNode/Jellyfish"]
+texture_repeat = 2
+position = Vector2(0.5, -104)
+scale = Vector2(1, 0.987654)
+texture = ExtResource("5_xxw5l")
+region_enabled = true
+region_rect = Rect2(0, 0, 15, 162)
+
+[node name="TopCollisionShape2D" type="CollisionShape2D" parent="JellyfishNode/Jellyfish"]
+position = Vector2(0.5, -103.5)
+shape = SubResource("RectangleShape2D_b61ab")
+
+[node name="TopLightOccluder2D" type="LightOccluder2D" parent="JellyfishNode/Jellyfish"]
+position = Vector2(-4.5, 5)
+occluder = SubResource("OccluderPolygon2D_1rvb5")
+
+[node name="BottomSprite2D" type="Sprite2D" parent="JellyfishNode/Jellyfish"]
+texture_repeat = 2
+position = Vector2(0.5, 104)
+scale = Vector2(1, 0.987654)
+texture = ExtResource("5_xxw5l")
+region_enabled = true
+region_rect = Rect2(0, 0, 15, 162)
+
+[node name="BottomCollisionShape2D" type="CollisionShape2D" parent="JellyfishNode/Jellyfish"]
+position = Vector2(0.5, 104)
+shape = SubResource("RectangleShape2D_b61ab")
+
+[node name="BottomLightOccluder2D" type="LightOccluder2D" parent="JellyfishNode/Jellyfish"]
+position = Vector2(-1.5, 213)
+occluder = SubResource("OccluderPolygon2D_kbjhb")
+
+[node name="CheckpointArea2D" type="Area2D" parent="JellyfishNode/Jellyfish"]
+script = ExtResource("6_d21hc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JellyfishNode/Jellyfish/CheckpointArea2D"]
+position = Vector2(1, 0)
+shape = SubResource("RectangleShape2D_b5vfc")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(-10, 0)
+zoom = Vector2(3, 3)
+
+[node name="CameraBox" type="Area2D" parent="Camera2D"]
+
+[node name="CameraShape2D" type="CollisionShape2D" parent="Camera2D/CameraBox"]
+position = Vector2(-12, 0)
+shape = SubResource("RectangleShape2D_cmteq")
+
+[node name="UI" parent="." instance=ExtResource("7_1xu3i")]
+
+[node name="Score" parent="UI" index="1"]
+offset_left = 8.0
+offset_top = -88.0
+offset_right = 48.0
+offset_bottom = -48.0
+
+[connection signal="area_entered" from="PlayerNode/Player/Detect" to="PlayerNode/Player" method="_on_detect_area_entered"]
+[connection signal="area_exited" from="PlayerNode/Player/Detect" to="PlayerNode/Player" method="_on_detect_area_exited"]
+[connection signal="body_entered" from="PlayerNode/Player/Detect" to="PlayerNode/Player" method="_on_detect_body_entered"]
+
+[editable path="UI"]

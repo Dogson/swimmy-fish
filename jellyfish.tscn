@@ -1,0 +1,62 @@
+[gd_scene load_steps=8 format=3 uid="uid://bb440lgwcsvu0"]
+
+[ext_resource type="Script" path="res://Jellyfish.gd" id="1_76pbi"]
+[ext_resource type="Texture2D" uid="uid://n8o844awi1i4" path="res://Jellyfish.png" id="1_u7g1d"]
+[ext_resource type="Script" path="res://CheckpointArea2D.gd" id="3_bmewx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b61ab"]
+size = Vector2(14, 159)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_1rvb5"]
+polygon = PackedVector2Array(-2.5, -189, -2.5, -29, 13.5, -29, 13.5, -189)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_kbjhb"]
+polygon = PackedVector2Array(-5.5, -189, 10.5, -189, 10.5, -29, -5.5, -29)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b5vfc"]
+size = Vector2(8, 48)
+
+[node name="JellyfishNode" type="Node2D"]
+position = Vector2(-1, 0)
+
+[node name="Jellyfish" type="StaticBody2D" parent="."]
+script = ExtResource("1_76pbi")
+
+[node name="TopSprite" type="Sprite2D" parent="Jellyfish"]
+texture_repeat = 2
+position = Vector2(0.5, -104)
+scale = Vector2(1, 0.987654)
+texture = ExtResource("1_u7g1d")
+region_enabled = true
+region_rect = Rect2(0, 0, 15, 162)
+
+[node name="TopCollisionShape2D" type="CollisionShape2D" parent="Jellyfish"]
+position = Vector2(0.5, -103.5)
+shape = SubResource("RectangleShape2D_b61ab")
+
+[node name="TopLightOccluder2D" type="LightOccluder2D" parent="Jellyfish"]
+position = Vector2(-4.5, 5)
+occluder = SubResource("OccluderPolygon2D_1rvb5")
+
+[node name="BottomSprite2D" type="Sprite2D" parent="Jellyfish"]
+texture_repeat = 2
+position = Vector2(0.5, 104)
+scale = Vector2(1, 0.987654)
+texture = ExtResource("1_u7g1d")
+region_enabled = true
+region_rect = Rect2(0, 0, 15, 162)
+
+[node name="BottomCollisionShape2D" type="CollisionShape2D" parent="Jellyfish"]
+position = Vector2(0.5, 104)
+shape = SubResource("RectangleShape2D_b61ab")
+
+[node name="BottomLightOccluder2D" type="LightOccluder2D" parent="Jellyfish"]
+position = Vector2(-1.5, 213)
+occluder = SubResource("OccluderPolygon2D_kbjhb")
+
+[node name="CheckpointArea2D" type="Area2D" parent="Jellyfish"]
+script = ExtResource("3_bmewx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Jellyfish/CheckpointArea2D"]
+position = Vector2(1, 0)
+shape = SubResource("RectangleShape2D_b5vfc")
